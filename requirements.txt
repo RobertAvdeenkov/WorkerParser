@@ -1,0 +1,10 @@
+aiosqlite
+asyncpg
+psycopg2
+sqlalchemy[asyncio]
+uvicorn[standard]
+python-jose[cryptography]
+redis
+aio_pika
+bcrypt
+fastapi

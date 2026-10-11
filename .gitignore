@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.env
+.pytest_cache/
+.ruff_cache/
+
+# VSCode
+.vscode/
+
+# OS
+workerparser.db

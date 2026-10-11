@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мониторинг цен</title>
+    <style>
+        :root {
+            --bg: #0d0d0d;
+            --bg-elevated: #1a1a1a;
+            --bg-input: #262626;
+            --accent: #ffcc00;
+            --accent-hover: #e6b800;
+            --border: #333;
+            --text-muted: #888;
+            --price: #4caf50;
+            --danger: #f44336;
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at 50% 0%, #1a1a1a 0%, var(--bg) 70%);
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            color: #eee;
+        }
+
+        .frame {
+            border: 3px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 24px 32px;
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255, 204, 0, 0.02);
+            box-shadow:
+                0 0 0 6px rgba(255, 204, 0, 0.08),
+                0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        h1, h2, h3 {
+            color: var(--accent);
+            margin: 10px 0;
+            letter-spacing: 1px;
+        }
+
+        h1 {
+            font-size: 28px;
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.35);
+        }
+
+        .container {
+            background-color: var(--bg);
+            text-align: center;
+            min-width: 40%;
+            height: auto;
+            padding: 16px;
+            border-radius: var(--radius);
+        }
+
+        .ots {
+            padding: 8px 12px;
+        }
+
+        button {
+            border-radius: var(--radius);
+            background-color: var(--accent);
+            color: #000;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+            box-shadow: 0 0 12px rgba(255, 204, 0, 0.4);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        input, select {
+            color: var(--accent);
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            border-radius: var(--radius);
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            width: 90%;
+            margin-bottom: 10px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.15);
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: opacity 0.2s ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            opacity: 0.85;
+        }
+
+        .product {
+            border: 1px solid var(--border);
+            padding: 14px 16px;
+            margin: 10px 0;
+            text-align: left;
+            background: var(--bg-elevated);
+            border-radius: var(--radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            transition: border-color 0.2s ease, transform 0.15s ease;
+        }
+
+        .product:hover {
+            border-color: rgba(255, 204, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
+
+        .product .price {
+            color: var(--price);
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .product .price-drop {
+            color: var(--danger);
+        }
+
+        .product .meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .logout {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .logout a {
+            color: var(--danger);
+        }
+
+        .empty {
+            color: var(--text-muted);
+            font-style: italic;
+            margin: 20px 0;
+        }
+
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: var(--radius);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="frame">
+        <h1>Мониторинг цен</h1>
+        <h2>Отслеживание товаров</h2>
+        <a href="/historylist">История парсера</a>
+
+        <div class="container">
+            <h3>Добавить товар</h3>
+            <input type="text" id="title" placeholder="Заголовок">
+            <br>
+            <input type="text" id="productUrl" placeholder="Ссылка на товар (Steam)">
+            <br>
+            <input type="number" id="targetPrice" placeholder="Целевая цена (уведомить, если ниже)">
+            <br>
+            <button onclick="addProduct()">Добавить</button>
+        </div>
+
+        <div class="container">
+            <h3>Мои товары</h3>
+            <div id="products">
+                <!-- Сюда будут подгружаться товары -->
+            </div>
+        </div>
+
+        <div class="logout">
+            <a href="/logout">Выйти</a>
+        </div>
+    </div>
+
+    <script>
+        async function fetchWithAuth(url, options = {}) {
+            let response = await fetch(url, options);
+            if (response.status === 401 || response.status ===422) {
+                const refreshResponse = await fetch('/refresh', { method: 'POST' });
+                console.log(refreshResponse.status)
+                if (refreshResponse.status!==401) {
+                    response = await fetch(url, options); // повторяем запрос
+                } else {
+                    window.location.href = '/'; // refresh тоже истёк
+                }
+            }
+            return response;
+        }
+
+        async function loadProducts() {
+            const response = await fetchWithAuth('/products');
+            const data = await response.json();
+            const container = document.getElementById('products');
+            container.innerHTML = '';
+
+            if (!data.products || data.products.length === 0) {
+                container.innerHTML = '<div class="empty">Товаров пока нет ¯\\_(ツ)_/¯</div>';
+                return;
+            }
+
+            data.products.forEach(product => {
+                const priceClass = product.current_price < product.target_price ? 'price-drop' : 'price';
+                container.innerHTML += `
+                    <div class="product">
+                        <div class="product-info">
+                            <h3>${product.name}</h3>
+                            <div class="${priceClass}">Текущая цена: ${product.current_price} ₽</div>
+                            <div class="meta">Целевая: ${product.target_price} ₽</div>
+                            <div class="meta">Обновлено: ${product.updated_at}</div>
+                            <div class="meta">Статус код: ${product.status_code}</div>
+                        </div>
+                        <div class="actions">
+                            <button onclick="deleteProduct(${product.id})">Удалить</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function addProduct() {
+            const title = document.getElementById('title').value;
+            const url = document.getElementById('productUrl').value;
+            const targetPrice = document.getElementById('targetPrice').value;
+
+            if (!url || !targetPrice || !title) {
+                alert('Заполните все поля');
+                return;
+            }
+
+            await fetchWithAuth('/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 'url': url, 'target_price': targetPrice, 'title':title })
+            });
+
+            document.getElementById('productUrl').value = '';
+            document.getElementById('targetPrice').value = '';
+            document.getElementById('title').value = '';
+            loadProducts();
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Удалить товар?')) return;
+            await fetchWithAuth(`/products/${id}`, { method: 'DELETE' });
+            loadProducts();
+        }
+
+        // Загрузка при старте
+        loadProducts();
+    </script>
+</body>
+</html>
