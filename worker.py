@@ -49,7 +49,7 @@ async def callback(message:pika.IncomingMessage):
                 [{'code': i[1], 'id': i[0], 'lp':i[2]} for i in result]
             )
             await db.execute(text('INSERT INTO history (price, created_at, user_id, sites_id) VALUES (:price, :createdat, :ui, :si)'),
-                            [{'price':j[2], 'createdat':datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'ui':j[2], 'si':j[0]} for j in result])
+                            [{'price':j[2], 'createdat':datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'ui':j[3], 'si':j[0]} for j in result])
             await db.commit()
 
 
