@@ -15,7 +15,7 @@ import asyncio
 import os
 
 router=APIRouter()
-r=redis.Redis()
+r=redis.from_url(os.getenv('REDIS_URL',''))
 
 async def update_worker():
     try:
