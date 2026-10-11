@@ -16,7 +16,7 @@ update=FastAPI()
 
 @update.on_event('startup')
 async def worker():
-    asyncio.create_task(update_worker())
+    asyncio.run(update_worker())
 
 @update.get('/')
 async def root():
