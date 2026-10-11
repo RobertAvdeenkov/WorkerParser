@@ -13,11 +13,18 @@ from tasks import update_worker
 
 update=FastAPI()
 
+background_tasks = set()
+
+def spawn(coro):
+    t = asyncio.create_task(coro)
+    background_tasks.add(t)
+    t.add_done_callback(background_tasks.discard)
+    return t
 
 @update.on_event('startup')
 async def worker():
     print('started')
-    asyncio.create_task(update_worker())
+    spawn(update_worker())
 
 @update.get('/')
 async def root():

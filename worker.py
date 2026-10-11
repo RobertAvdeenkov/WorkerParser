@@ -12,6 +12,14 @@ import os
 
 app=FastAPI()
 
+background_tasks = set()
+
+def spawn(coro):
+    t = asyncio.create_task(coro)
+    background_tasks.add(t)
+    t.add_done_callback(background_tasks.discard)
+    return t
+
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -68,7 +76,7 @@ async def main():
 
 @app.on_event('startup')
 async def worker():
-    asyncio.create_task(main())
+    spawn(main())
 
 @app.get('/')
 async def root():

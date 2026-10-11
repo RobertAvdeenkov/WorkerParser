@@ -22,22 +22,22 @@ async def update_worker():
         connection= await pika.connect_robust(os.getenv('RABBITMQ_URL', ''))
         channel= await connection.channel()
         queue= await channel.declare_queue('sites')
-        async with channel:
-            async with SessionLocal() as db: #type:ignore
+        async with channel: #type:ignore
                 while True:
-                    print('new requsts')
-                    result=await db.execute(text('''
-                    select id,url,user_id from sites
-                    where last_seen<=NOW() - INTERVAL \'1 minute\'
-                    '''))
-                    sites=result.all()
-                    all_sites=[]
-                    for i in sites:
-                        all_sites.append((str(i[0]),str(i[1]),str(i[2])))
-                    print(all_sites)
-                    if all_sites:
-                        await channel.default_exchange.publish(message=pika.Message(json.dumps(all_sites).encode()), routing_key='sites')
-                    await asyncio.sleep(60)
+                    async with SessionLocal() as db: #type:ignore
+                        print('new requsts')
+                        result=await db.execute(text('''
+                        select id,url,user_id from sites
+                        where last_seen<=NOW() - INTERVAL \'1 minute\'
+                        '''))
+                        sites=result.all()
+                        all_sites=[]
+                        for i in sites:
+                            all_sites.append((str(i[0]),str(i[1]),str(i[2])))
+                        print(all_sites)
+                        if all_sites:
+                            await channel.default_exchange.publish(message=pika.Message(json.dumps(all_sites).encode()), routing_key='sites')
+                        await asyncio.sleep(1)
 
     except KeyboardInterrupt:
         return
