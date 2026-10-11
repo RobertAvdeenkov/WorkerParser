@@ -54,7 +54,7 @@ async def callback(message:pika.IncomingMessage):
 
 
 async def main():
-    connection= await pika.connect_robust()
+    connection= await pika.connect_robust(os.getenv('RABBITMQ_URL', ''))
     async with connection:
         channel=await connection.channel()
         queue=await channel.declare_queue('sites')

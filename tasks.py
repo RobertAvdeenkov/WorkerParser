@@ -12,13 +12,14 @@ import json
 from sqlalchemy.orm import selectinload
 import aio_pika as pika
 import asyncio
+import os
 
 router=APIRouter()
 r=redis.Redis()
 
 async def update_worker():
     try:
-        connection= await pika.connect_robust()
+        connection= await pika.connect_robust(os.getenv('RABBITMQ_URL', ''))
         channel= await connection.channel()
         queue= await channel.declare_queue('sites')
         async with channel:
