@@ -35,14 +35,10 @@ async def update_worker():
                         all_sites.append((str(i[0]),str(i[1]),str(i[2])))
                     if all_sites:
                         await channel.default_exchange.publish(message=pika.Message(json.dumps(all_sites).encode()), routing_key='sites')
-                    await asyncio.sleep(10)
+                    await asyncio.sleep(60)
 
     except KeyboardInterrupt:
         return
-
-@router.on_event('startup')
-async def startup():
-    asyncio.create_task(update_worker())
 
 @router.get('/historylist')
 async def historylist():
