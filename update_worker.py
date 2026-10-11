@@ -16,12 +16,11 @@ update=FastAPI()
 
 @update.on_event('startup')
 async def worker():
+    print('started')
     asyncio.create_task(update_worker())
 
 @update.get('/')
 async def root():
     return {'status':'ok'}
     
-if __name__=='__main__':
-    print('Started')
-    uvicorn.run(update, host='0.0.0.0', port=int(os.getenv('PORT', 10000)))
+uvicorn.run(update, host='0.0.0.0', port=int(os.getenv('PORT', 10000)))
