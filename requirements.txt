@@ -10,3 +10,4 @@ bcrypt
 fastapi
 python-multipart
 httpx
+bs4
