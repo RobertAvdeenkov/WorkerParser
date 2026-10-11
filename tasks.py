@@ -34,6 +34,7 @@ async def update_worker():
                     all_sites=[]
                     for i in sites:
                         all_sites.append((str(i[0]),str(i[1]),str(i[2])))
+                    print(all_sites)
                     if all_sites:
                         await channel.default_exchange.publish(message=pika.Message(json.dumps(all_sites).encode()), routing_key='sites')
                     await asyncio.sleep(60)
