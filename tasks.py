@@ -24,7 +24,6 @@ async def update_worker():
         async with channel:
             async with SessionLocal() as db: #type:ignore
                 while True:
-                    print('gg')
                     result=await db.execute(text('''
                     select id,url,user_id from sites
                     where last_seen<=CURRENT_TIMESTAMP
