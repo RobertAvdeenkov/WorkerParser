@@ -22,5 +22,3 @@ async def worker():
 @update.get('/')
 async def root():
     return {'status':'ok'}
-    
-uvicorn.run(update, host='0.0.0.0', port=int(os.getenv('PORT', 10000)))
