@@ -6,19 +6,19 @@ from datetime import datetime,timedelta
 import os
 from fastapi import HTTPException
 
-SECRET=os.getenv('SECRET','arv')
-ALGORITHM=os.getenv('ALGORITHM','HS256')
+SECRET=os.getenv('SECRET')
+ALGORITHM=os.getenv('ALGORITHM')
 
 def create_token(user:str, timedelta):
     payload={
         'sub':user,
         'exp':datetime.now()+timedelta
     }
-    return jwt.encode(payload,SECRET,ALGORITHM)
+    return jwt.encode(payload,SECRET,ALGORITHM) #type:ignore
 
 async def get_by_token(token:str):
     try:
-        name=jwt.decode(token,SECRET,algorithms=[ALGORITHM])['sub']
+        name=jwt.decode(token,SECRET,algorithms=[ALGORITHM])['sub'] #type:ignore
         async with SessionLocal() as db: #type:ignore
             result=(await db.execute(select(User).filter(User.name==name))).first()
             if not result:
