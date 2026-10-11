@@ -28,7 +28,7 @@ async def update_worker():
                     print('new requsts')
                     result=await db.execute(text('''
                     select id,url,user_id from sites
-                    where last_seen<=CURRENT_TIMESTAMP
+                    where last_seen<=NOW() - INTERVAL \'1 minute\'
                     '''))
                     sites=result.all()
                     all_sites=[]

@@ -45,7 +45,7 @@ async def callback(message:pika.IncomingMessage):
         async with SessionLocal() as db: #type:ignore
             print(result)
             await db.execute(
-                text('UPDATE sites SET last_seen = CURRENT_TIMESTAMP, status_code = :code, last_price = :lp WHERE id = :id'),
+                text('UPDATE sites SET last_seen = NOW(), status_code = :code, last_price = :lp WHERE id = :id'),
                 [{'code': i[1], 'id': i[0], 'lp':i[2]} for i in result]
             )
             await db.execute(text('INSERT INTO history (price, created_at, user_id, sites_id) VALUES (:price, :createdat, :ui, :si)'),
