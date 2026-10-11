@@ -33,7 +33,7 @@ async def callback(message:pika.IncomingMessage):
                     if i[1].startswith('https://store.steampowered.com'):
                         pricediv=soup.find(class_='discount_final_price')
                         if pricediv:
-                            pricediv=pricediv.get_text(strip=True).strip('руб.')
+                            pricediv=pricediv.get_text(strip=True).strip('руб.').strip('€').strip('$')
                         else:
                             pricediv=soup.find(class_='game_purchase_price price')
                             if pricediv:
