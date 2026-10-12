@@ -82,6 +82,7 @@ async def history(message:types.Message, state:FSMContext):
 
 @app.on_event('startup')
 async def main():
+    await bot.delete_webhook(drop_pending_updates=True)
     task = asyncio.create_task(db.start_polling(bot))
     tasks.add(task)
     task.add_done_callback(tasks.discard)
