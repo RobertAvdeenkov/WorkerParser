@@ -9,6 +9,7 @@ import bcrypt
 from sqlalchemy.orm import selectinload
 from fastapi import FastAPI
 import asyncio
+import os
 
 tasks=set()
 
@@ -18,7 +19,7 @@ class Form(StatesGroup):
     waiting_for_login = State()
     waiting_for_password = State()
 
-Token='8930739545:AAGjEAlHHS8RCbvbxtBKDXYVEpB5CYYFMy8'
+Token=os.getenv('TOKEN')
 
 bot=Bot(token=Token)
 db=Dispatcher()
