@@ -10,4 +10,5 @@ bcrypt
 fastapi
 python-multipart
 httpx
+aiogram
 bs4
