@@ -27,7 +27,8 @@ async def answer(message: types.Message, state:FSMContext):
     data=await state.get_data()
     if data.get('user_id'):
         await message.answer(f'Здравствуйте, {data.get('login')}\nДля того, чтобы посмотреть историю парсера, введите /history')
-    await message.answer('Добро пожаловать в тг-бота сайта\nhttps://steamparser.onrender.com/\nВведите /login, чтобы войти в аккаунт\n')
+    else:
+        await message.answer('Добро пожаловать в тг-бота сайта\nhttps://steamparser.onrender.com/\nВведите /login, чтобы войти в аккаунт\n')
 
 @db.message(F.text=='/login')
 async def login(message:types.Message, state:FSMContext):
@@ -63,6 +64,7 @@ async def enterpassword(message:types.Message, state:FSMContext):
 @db.message(F.text=='/history')
 async def history(message:types.Message, state:FSMContext):
     data=await state.get_data()
+    print(data,'data')
     id_data=data.get('user_id')
     if not id_data:
         await message.answer('Вы не вошли в аккаунт! Чтобы войти введите /login')
