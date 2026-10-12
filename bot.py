@@ -65,7 +65,6 @@ async def enterpassword(message:types.Message, state:FSMContext):
 @db.message(Command('history'))
 async def history(message:types.Message, state:FSMContext):
     data=await state.get_data()
-    print(data,'data')
     id_data=data.get('user_id')
     if not id_data:
         await message.answer('Вы не вошли в аккаунт! Чтобы войти введите /login')
@@ -89,7 +88,7 @@ async def history(message:types.Message, state:FSMContext):
     return
 
 @db.message(Command('logout'))
-async def logout(state:FSMContext, message:types.Message):
+async def logout( message:types.Message, state:FSMContext):
     await state.clear()
     await message.answer(f'Вы вышли из аккаунта')
     return
