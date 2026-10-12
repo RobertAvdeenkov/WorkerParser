@@ -7,6 +7,9 @@ from models import User,History
 import bcrypt
 from sqlalchemy.orm import selectinload
 from fastapi import FastAPI
+import asyncio
+
+tasks=set()
 
 app=FastAPI()
 
@@ -79,12 +82,10 @@ async def history(message:types.Message, state:FSMContext):
 
 @app.on_event('startup')
 async def main():
-    webhook_url = f"https://workerparsertgbot.onrender.com/webhook/{Token}"
-    await bot.set_webhook(url=webhook_url)
+    task = asyncio.create_task(db.start_polling(bot))
+    tasks.add(task)
+    task.add_done_callback(tasks.discard)
 
-@app.post('/webhook/{token}')
-async def root(token:int, update:dict):
-    if token != Token:
-        return
-    telegram_update = types.Update(**update)
-    await db.feed_update(bot, telegram_update)
+@app.get('/')
+async def root():
+    return {'status':'ok'}
