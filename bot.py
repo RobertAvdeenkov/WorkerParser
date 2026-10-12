@@ -59,8 +59,8 @@ async def enterpassword(message:types.Message, state:FSMContext):
             await message.answer('Неправильный логин или пароль!')
             return
         await state.update_data(user_id=user.id)
+        await state.set_state(None)
         await message.answer(f'Здравствуйте, {user.name}\nДля того, чтобы посмотреть историю парсера, введите /history')
-        return
 
 @db.message(Command('history'))
 async def history(message:types.Message, state:FSMContext):
