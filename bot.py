@@ -60,7 +60,7 @@ async def enterpassword(message:types.Message, state:FSMContext):
             return
         await state.update_data(user_id=user.id)
         await state.set_state(None)
-        await message.answer(f'Здравствуйте, {user.name}\nДля того, чтобы посмотреть историю парсера, введите /history')
+        await message.answer(f'Здравствуйте, {user.name}\nДля того, чтобы посмотреть историю парсера, введите /history, а чтобы выйти из аккаунта - /logout')
 
 @db.message(Command('history'))
 async def history(message:types.Message, state:FSMContext):
@@ -86,6 +86,12 @@ async def history(message:types.Message, state:FSMContext):
                 '''
         else: txt+='Ничего не найдено :('
     await message.answer(txt)
+    return
+
+@db.message(Command('logout'))
+async def logout(state:FSMContext, message:types.Message):
+    await state.clear()
+    await message.answer(f'Вы вышли из аккаунта')
     return
 
 @app.on_event('startup')
