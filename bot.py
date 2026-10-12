@@ -23,7 +23,10 @@ bot=Bot(token=Token)
 db=Dispatcher()
 
 @db.message(F.text=='/start')
-async def answer(message: types.Message):
+async def answer(message: types.Message, state:FSMContext):
+    data=await state.get_data()
+    if data.get('user_id'):
+        await message.answer(f'Здравствуйте, {data.get('login')}\nДля того, чтобы посмотреть историю парсера, введите /history')
     await message.answer('Добро пожаловать в тг-бота сайта\nhttps://steamparser.onrender.com/\nВведите /login, чтобы войти в аккаунт\n')
 
 @db.message(F.text=='/login')
@@ -55,6 +58,7 @@ async def enterpassword(message:types.Message, state:FSMContext):
             return
         await state.update_data(user_id=user.id)
         await message.answer(f'Здравствуйте, {user.name}\nДля того, чтобы посмотреть историю парсера, введите /history')
+        return
 
 @db.message(F.text=='/history')
 async def history(message:types.Message, state:FSMContext):
@@ -79,6 +83,7 @@ async def history(message:types.Message, state:FSMContext):
                 '''
         else: txt+='Ничего не найдено :('
     await message.answer(txt)
+    return
 
 @app.on_event('startup')
 async def main():
