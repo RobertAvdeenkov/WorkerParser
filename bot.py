@@ -1,6 +1,7 @@
 from aiogram import Bot,Dispatcher,types,F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from aiogram.filters import Command
 from database import SessionLocal
 from sqlalchemy import select,desc
 from models import User,History
@@ -22,7 +23,7 @@ Token='8930739545:AAGjEAlHHS8RCbvbxtBKDXYVEpB5CYYFMy8'
 bot=Bot(token=Token)
 db=Dispatcher()
 
-@db.message(F.text=='/start')
+@db.message(Command('start'))
 async def answer(message: types.Message, state:FSMContext):
     data=await state.get_data()
     if data.get('user_id'):
@@ -30,7 +31,7 @@ async def answer(message: types.Message, state:FSMContext):
     else:
         await message.answer('Добро пожаловать в тг-бота сайта\nhttps://steamparser.onrender.com/\nВведите /login, чтобы войти в аккаунт\n')
 
-@db.message(F.text=='/login')
+@db.message(Command('login'))
 async def login(message:types.Message, state:FSMContext):
     await message.answer('Введите логин:')
     await state.set_state(Form.waiting_for_login) #type:ignore
@@ -61,7 +62,7 @@ async def enterpassword(message:types.Message, state:FSMContext):
         await message.answer(f'Здравствуйте, {user.name}\nДля того, чтобы посмотреть историю парсера, введите /history')
         return
 
-@db.message(F.text=='/history')
+@db.message(Command('history'))
 async def history(message:types.Message, state:FSMContext):
     data=await state.get_data()
     print(data,'data')
