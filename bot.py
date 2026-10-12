@@ -79,9 +79,12 @@ async def history(message:types.Message, state:FSMContext):
 
 @app.on_event('startup')
 async def main():
-    print('started')
-    await db.start_polling(bot)
+    webhook_url = f"https://workerparsertgbot.onrender.com/webhook/{Token}"
+    await bot.set_webhook(url=webhook_url)
 
-@app.get('/')
-async def root():
-    return {'status':'ok'}
+@app.post('/webhook/{token}')
+async def root(token:int, update:dict):
+    if token != Token:
+        return
+    telegram_update = types.Update(**update)
+    await db.feed_update(bot, telegram_update)
