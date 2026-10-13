@@ -104,24 +104,24 @@ async def history(message:types.Message, state:FSMContext):
     await state.update_data(page=1)
     await historyLogic(message=message, state=state) #type:ignore
 
-@db.callback_query(F.data=='back')
-async def prev(message:types.Message, state:FSMContext,call: CallbackQuery):
+@db.message(F.data=='back')
+async def prev(message:types.Message, state:FSMContext):
     data= await state.get_data()
     page=data.get('page')
     if not page: return
     if int(page)-1<=0:
         await message.answer('Предыдущих страниц нет!')
     await state.update_data(page=int(page)-1)
-    await historyLogic(message=call.message, state=state) #type:ignore
+    await historyLogic(message=message, state=state) #type:ignore
 
-@db.callback_query(F.data=='next')
-async def nextpage(message:types.Message, state:FSMContext,call: CallbackQuery):
+@db.message(F.data=='next')
+async def nextpage(message:types.Message, state:FSMContext):
     data= await state.get_data()
     page=data.get('page')
     if not page: return
     await message.answer('Предыдущих страниц нет!')
     await state.update_data(page=int(page)+1)
-    await historyLogic(message=call.message, state=state) #type:ignore
+    await historyLogic(message=message, state=state) #type:ignore
 
 @db.message(Command('logout'))
 async def logout( message:types.Message, state:FSMContext):
