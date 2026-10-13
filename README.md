@@ -21,4 +21,20 @@
     1) docker run -d --name rabbitmq -p 5672:5672 rabbitmq:3.13 - запустить брокера
     2) docker run -p 6379:6379 --name redis -d redis:7-alpine - запустить Redis
 4. В терминале введите: python -m uvicorn main:app --reload
-5. После запуска в другом терминале: python worker.py
+5. После запуска в другом терминале: python -m uvicorn worker:app --reload
+6. Потом: python -m uvicorn update_worker:update --reload
+7. Запуск ТГ бота(по желанию): python bot.py
+
+## Функции:
+1. Ввод ссылки, заголовка для нее и целевую сумму
+2. Просмотр истории парсера с пагинацией
+3. Удаление ссылки
+4. ТГ бот имеет функции входа в аккаунт, выхода из него, просмотра истории с пагинацией
+
+## Переменные Environment:
+1. SECRET - придуманный вами пароль для JWT токена
+2. ALGORITHM - алгоритм шифрования для JWT токена
+3. RABBITMQ_URL - ссылка на воркера
+4. REDIS_URL - ссылка на кеширование
+5. DATABASE_URL - ссылка на БД
+6. TOKEN - токен бота
