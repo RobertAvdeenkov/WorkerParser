@@ -100,9 +100,9 @@ async def historyLogic(message:types.Message | None, state:FSMContext):
     return
 
 @db.message(Command('history'))
-async def history(message:types.Message, state:FSMContext,call: CallbackQuery):
+async def history(message:types.Message, state:FSMContext):
     await state.update_data(page=1)
-    await historyLogic(message=call.message, state=state) #type:ignore
+    await historyLogic(message=message, state=state) #type:ignore
 
 @db.callback_query(F.data=='back')
 async def prev(message:types.Message, state:FSMContext,call: CallbackQuery):
