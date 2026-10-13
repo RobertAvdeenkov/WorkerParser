@@ -99,7 +99,7 @@ async def historyLogic(message:types.Message | None, state:FSMContext):
     await message.answer(txt, reply_markup=builder.as_markup()) #type:ignore
     return
 
-@db.callback_query(Command('history'))
+@db.message(Command('history'))
 async def history(message:types.Message, state:FSMContext,call: CallbackQuery):
     await state.update_data(page=1)
     await historyLogic(message=call.message, state=state) #type:ignore
