@@ -99,12 +99,12 @@ async def historyLogic(message:types.Message | None, state:FSMContext):
     await message.answer(txt, reply_markup=builder.as_markup()) #type:ignore
     return
 
-@db.message(Command('history'))
+@db.callback_query(Command('history'))
 async def history(message:types.Message, state:FSMContext,call: CallbackQuery):
     await state.update_data(page=1)
     await historyLogic(message=call.message, state=state) #type:ignore
 
-@db.message(F.data=='back')
+@db.callback_query(F.data=='back')
 async def prev(message:types.Message, state:FSMContext,call: CallbackQuery):
     data= await state.get_data()
     page=data.get('page')
@@ -114,7 +114,7 @@ async def prev(message:types.Message, state:FSMContext,call: CallbackQuery):
     await state.update_data(page=int(page)-1)
     await historyLogic(message=call.message, state=state) #type:ignore
 
-@db.message(F.data=='next')
+@db.callback_query(F.data=='next')
 async def nextpage(message:types.Message, state:FSMContext,call: CallbackQuery):
     data= await state.get_data()
     page=data.get('page')
