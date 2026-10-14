@@ -15,6 +15,7 @@
 6. SQLAlchemy[asyncio]
 7. Uvicorn
 8. Python-jose[cryptography]
+9. Pytest
 
 ## Запуск:
 1. Установите файлы
