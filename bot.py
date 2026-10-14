@@ -96,6 +96,8 @@ async def historyLogic(message:types.Message | None, state:FSMContext):
                 ---
                 '''
         else: txt+='Ничего не найдено :('
+        print(result)
+        print(txt)
     await message.answer(txt, reply_markup=builder.as_markup()) #type:ignore
     return
 
