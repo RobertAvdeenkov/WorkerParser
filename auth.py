@@ -6,8 +6,8 @@ from datetime import datetime,timedelta
 import os
 from fastapi import HTTPException
 
-SECRET=os.getenv('SECRET')
-ALGORITHM=os.getenv('ALGORITHM')
+SECRET=os.getenv('SECRET','arv')
+ALGORITHM=os.getenv('ALGORITHM','HS256')
 
 def create_token(user:str, timedelta):
     payload={

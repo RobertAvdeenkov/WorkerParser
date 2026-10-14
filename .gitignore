@@ -11,3 +11,4 @@ venv/
 
 # OS
 workerparser.db
+test_workerparser.db
