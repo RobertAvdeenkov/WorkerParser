@@ -88,17 +88,17 @@ async def historyLogic(message:types.Message | None, state:FSMContext):
         if result:
             for i in result:
                 history_site=i[0]
-                txt+=f'''
-                {history_site.site.title}
-                Статус код: {history_site.site.status_code}
-                Цена: {history_site.price}
-                Дата: {history_site.created_at.strftime("%Y.%m.%d %H:%M")}
-                ---
-                '''
+                try:
+                    txt+=f'''
+                    {history_site.site.title}
+                    Статус код: {history_site.site.status_code}
+                    Цена: {history_site.price}
+                    Дата: {history_site.created_at.strftime("%Y.%m.%d %H:%M")}
+                    ---
+                    '''
+                except: pass
         else: txt+='Ничего не найдено :('
         txt+=f'\nСтраница {page}'
-        print(result)
-        print(txt)
     await message.answer(txt, reply_markup=builder.as_markup()) #type:ignore
     return
 
@@ -122,7 +122,6 @@ async def nextpage(message:types.Message, state:FSMContext):
     data= await state.get_data()
     page=data.get('page')
     if not page: return
-    await message.answer('Предыдущих страниц нет!')
     await state.update_data(page=int(page)+1)
     await historyLogic(message=message, state=state) #type:ignore
 
