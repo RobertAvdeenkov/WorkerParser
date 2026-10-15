@@ -12,3 +12,5 @@ python-multipart
 httpx
 aiogram
 bs4
+pytest
+pytest-asyncio
