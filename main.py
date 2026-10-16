@@ -4,8 +4,10 @@ import os
 from sqlalchemy import create_engine
 from tasks import router
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 app=FastAPI()
+app.mount("/templates", StaticFiles(directory="templates"), name="templates")
 
 app.add_middleware(
     CORSMiddleware,

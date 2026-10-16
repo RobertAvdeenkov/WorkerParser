@@ -10,8 +10,8 @@
 
 ## Технологии:
 1. Python 3.14
-2. RabbitMQ
-3. Redis
+2. RabbitMQ(aio_pika)
+3. Redis(redis.asyncio)
 4. FastAPI
 5. Bcrypt
 6. SQLAlchemy[asyncio]
