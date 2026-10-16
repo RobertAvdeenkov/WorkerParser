@@ -13,6 +13,7 @@ from sqlalchemy.orm import selectinload
 import aio_pika as pika
 import asyncio
 import os
+import logger
 
 router=APIRouter()
 if os.getenv('REDIS_URL'):
@@ -27,7 +28,6 @@ async def update_worker():
         async with channel: #type:ignore
                 while True:
                     async with SessionLocal() as db: #type:ignore
-                        print('new requsts')
                         result=await db.execute(text('''
                         select id,url,user_id from sites
                         where last_seen<=NOW() - INTERVAL \'1 minute\'
@@ -36,7 +36,6 @@ async def update_worker():
                         all_sites=[]
                         for i in sites:
                             all_sites.append((str(i[0]),str(i[1]),str(i[2])))
-                        print(all_sites)
                         if all_sites:
                             await channel.default_exchange.publish(message=pika.Message(json.dumps(all_sites).encode()), routing_key='sites')
                         await asyncio.sleep(1)
@@ -69,6 +68,7 @@ async def reg(name=Form(), password=Form(), db:AsyncSession=Depends(get_db)):
     db.add(target)
     await db.commit()
     response=RedirectResponse('/',status_code=303)
+    logger.logger.info(f'New user: {name}')
     return response
 
 @router.post('/login')
@@ -116,6 +116,7 @@ async def add_product(access_token=Cookie(), data=Body(), db:AsyncSession=Depend
     db.add(target)
     await db.commit()
     await r.delete(f'{user.name}:products')
+    logger.logger.info(f'New product from: {user} with url: {data['url']}')
 
 @router.delete('/products/{id}')
 async def delete_products(id:int, access_token=Cookie(), db:AsyncSession=Depends(get_db)):

@@ -10,6 +10,7 @@ from fastapi import FastAPI
 import uvicorn
 import os
 from tasks import update_worker
+import logger
 
 update=FastAPI()
 
@@ -23,7 +24,7 @@ def spawn(coro):
 
 @update.on_event('startup')
 async def worker():
-    print('started')
+    logger.logger.info('Started Update Worker')
     spawn(update_worker())
 
 @update.get('/')

@@ -9,6 +9,7 @@ from datetime import datetime
 from fastapi import FastAPI
 import uvicorn
 import os
+import logger
 
 app=FastAPI()
 
@@ -36,7 +37,6 @@ async def callback(message:pika.IncomingMessage):
             for i in data:
                 response=await client.get(i[1], headers=headers)
                 try:
-                    print('started')
                     soup=BeautifulSoup(response.content, 'html.parser')
                     if i[1].startswith('https://store.steampowered.com'):
                         pricediv=soup.find(class_='discount_final_price')
@@ -51,7 +51,6 @@ async def callback(message:pika.IncomingMessage):
                 finally:
                     result.append((i[0], response.status_code, round(float(pricediv)) if pricediv!='No' else 0, i[2])) #type:ignore
         async with SessionLocal() as db: #type:ignore
-            print(result)
             await db.execute(
                 text('UPDATE sites SET last_seen = NOW(), status_code = :code, last_price = :lp WHERE id = :id'),
                 [{'code': i[1], 'id': i[0], 'lp':i[2]} for i in result]
@@ -68,7 +67,7 @@ async def main():
         queue=await channel.declare_queue('sites')
 
         await queue.consume(callback) #type:ignore
-        print('started')
+        logger.logger.info('Started RabbitMQ Worker')
         try:
             await asyncio.Future()
         except KeyboardInterrupt:
