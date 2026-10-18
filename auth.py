@@ -2,7 +2,7 @@ from jose import jwt,JWTError,ExpiredSignatureError
 from database import SessionLocal
 from sqlalchemy import select
 from models import User
-from datetime import datetime,timedelta
+from datetime import datetime
 import os
 from fastapi import HTTPException
 

@@ -12,6 +12,7 @@ from fastapi import FastAPI
 import asyncio
 import os
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+import logger
 
 tasks=set()
 
@@ -133,6 +134,7 @@ async def logout( message:types.Message, state:FSMContext):
 
 @app.on_event('startup')
 async def main():
+    logger.logger.info('Started Telegram Bot')
     await bot.delete_webhook(drop_pending_updates=True)
     task = asyncio.create_task(db.start_polling(bot))
     tasks.add(task)

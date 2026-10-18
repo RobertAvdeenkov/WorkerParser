@@ -2,14 +2,11 @@
 ![Главная страница](screenshots/mainpage.png)
 
 Сервис для парсинга цен на товары стим.
-Пользователь вводит ссылку, и RabbitMQ вокер парсит каждую минуту.
-Есть возможность просматривать историю парсинга с пагинацией и сортировкой за последние день, неделю, месяц или за все время.
-В проекте участвует кеширование для оптимизации и асинхронная БД.
-
+Пользователь вводит ссылку, и RabbitMQ вокер парсит каждую минуту. Также для особых случаев(ссылка не от стима или она не открывается) есть retry-вокер, а также DLX. Есть возможность просматривать историю парсинга с пагинацией и сортировкой за последние день, неделю, месяц или за все время. В проекте участвует кеширование для оптимизации и асинхронная БД.
 Ссылка на сайт: https://steamparser.onrender.com/
 
 ## Технологии:
-1. Python 3.14
+1. Logging
 2. RabbitMQ(aio_pika)
 3. Redis(redis.asyncio)
 4. FastAPI
@@ -17,7 +14,7 @@
 6. SQLAlchemy[asyncio]
 7. Uvicorn
 8. Python-jose[cryptography]
-9. Pytest
+9. Pytest-asyncio
 
 ## Запуск:
 1. Установите файлы
@@ -26,10 +23,13 @@
 4. Запуск воркера и кеширования:
     1) docker run -d --name rabbitmq -p 5672:5672 rabbitmq:3.13 - запустить брокера
     2) docker run -p 6379:6379 --name redis -d redis:7-alpine - запустить Redis
-4. В терминале введите: python -m uvicorn main:app --reload
-5. После запуска в другом терминале: python -m uvicorn worker:app --reload
-6. Потом: python -m uvicorn update_worker:update --reload
-7. Запуск ТГ бота(по желанию): python bot.py
+5. В отдельных терминалах введите:
+    1) uvicorn main:app --reload - сайт
+    2) uvicorn update_worker:update --reload - отправка непросмотренных ссылок воркеру
+    3) uvicorn worker:app --reload - основной воркер
+    4) uvicorn retry_worker:app --reload - retry воркер
+    5) uvicorn DLX_worker:app --reload - DLX - воркер
+6. Запуск ТГ бота(по желанию): python bot.py
 
 ## Функции:
 1. Ввод ссылки, заголовка для нее и целевую сумму

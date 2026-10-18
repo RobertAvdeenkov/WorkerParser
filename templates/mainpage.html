@@ -69,7 +69,8 @@
                     <div class="product">
                         <div class="product-info">
                             <h3>${product.name}</h3>
-                            <div class="${priceClass}">Текущая цена: ${product.current_price} ₽</div>
+                            <div class="meta" style="color: ${product.result === 'FAILED' ? 'red' : 'white'};">Результат: ${product.result}</div>
+                            <div class="${priceClass}">Текущая цена: ${product.current_price} единиц</div>
                             <div class="meta">Целевая: ${product.target_price} ₽</div>
                             <div class="meta">Обновлено: ${product.updated_at}</div>
                             <div class="meta">Статус код: ${product.status_code}</div>
