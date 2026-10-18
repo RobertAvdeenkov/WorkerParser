@@ -1,4 +1,3 @@
-import httpx
 from bs4 import BeautifulSoup
 import aio_pika as pika
 import asyncio
