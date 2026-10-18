@@ -17,12 +17,12 @@ import logger
 
 router=APIRouter()
 if os.getenv('REDIS_URL'):
-    r=redis.from_url(os.getenv('REDIS_URL',''))
-else: r=redis.Redis()
+    r=redis.from_url(os.getenv('REDIS_URL',''), decode_responses=True)
+else: r=redis.Redis(decode_responses=True)
 
 async def update_worker():
     try:
-        connection= await pika.connect_robust(os.getenv('RABBITMQ_URL', ''))
+        connection= await pika.connect_robust(os.getenv('RABBITMQ_URL', None))
         channel= await connection.channel()
         queue= await channel.declare_queue('sites')
         async with channel: #type:ignore
@@ -30,7 +30,7 @@ async def update_worker():
                     async with SessionLocal() as db: #type:ignore
                         result=await db.execute(text('''
                         select id,url,user_id from sites
-                        where last_seen<=NOW() - INTERVAL \'1 minute\'
+                        where last_seen<=NOW() and result=\'Success\'
                         '''))
                         sites=result.all()
                         all_sites=[]
@@ -38,8 +38,7 @@ async def update_worker():
                             all_sites.append((str(i[0]),str(i[1]),str(i[2])))
                         if all_sites:
                             await channel.default_exchange.publish(message=pika.Message(json.dumps(all_sites).encode()), routing_key='sites')
-                        await asyncio.sleep(1)
-
+                        await asyncio.sleep(60)
     except KeyboardInterrupt:
         return
 
@@ -105,7 +104,7 @@ async def products(access_token=Cookie(), db:AsyncSession=Depends(get_db)):
     products=(await db.execute(select(Site).filter(Site.user_id==user.id))).all()
     all_products=[]
     for i in products:
-        all_products.append({'status_code':str(i[0].status_code),'id':i[0].id,'name':i[0].title, 'current_price':str(i[0].last_price), 'target_price':str(i[0].wanted_price),'updated_at':str(i[0].last_seen.strftime("%Y.%m.%d %H:%M"))})
+        all_products.append({'result':str(i[0].result),'status_code':str(i[0].status_code),'id':i[0].id,'name':i[0].title, 'current_price':str(i[0].last_price), 'target_price':str(i[0].wanted_price),'updated_at':str(i[0].last_seen.strftime("%Y.%m.%d %H:%M:%S"))})
     await r.setex(f'{user.name}:products',60,json.dumps(all_products))
     return {'products':all_products}
 
@@ -116,7 +115,7 @@ async def add_product(access_token=Cookie(), data=Body(), db:AsyncSession=Depend
     db.add(target)
     await db.commit()
     await r.delete(f'{user.name}:products')
-    logger.logger.info(f'New product from: {user} with url: {data['url']}')
+    logger.logger.info(f'New product from: {user.name} with url: {data['url']}')
 
 @router.delete('/products/{id}')
 async def delete_products(id:int, access_token=Cookie(), db:AsyncSession=Depends(get_db)):

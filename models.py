@@ -20,6 +20,7 @@ class Site(Base):
     url=Column(String)
     user_id=Column(Integer, ForeignKey('users.id'))
     status_code=Column(Integer, default=200)
+    result=Column(String, default='Success')
 
     last_seen=Column(DateTime,default=func.now())
     wanted_price=Column(Integer, default=0)
