@@ -19,15 +19,15 @@ Base.metadata.create_all(sync_engine)
 
 TestSession=sessionmaker(engine, class_=AsyncSession, expire_on_commit=False) #type:ignore
 
-async def fetch(url, type, params={}):
+async def fetch(url, type, params={}, json=False):
     transport=httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(base_url='http://127.0.0.1', transport=transport) as testclient:
         if type=='get':
             response=await testclient.get(url)
-            return response.status_code
+            return response.status_code if not(json) else (response.status_code, response.json())
         elif type=='post':
             response=await testclient.post(url, data=params)
-            return response.status_code
+            return response.status_code if not(json) else (response.status_code, response.json())
 
 async def get_overdb():
     async with TestSession() as db: #type:ignore
@@ -88,3 +88,11 @@ async def test_history_show():
     async with httpx.AsyncClient(base_url='http://127.0.0.1', transport=transport) as testclient:
         response=await testclient.post('/history?period=7', json= {'page':1}, cookies={'access_token':create_token(user='test', timedelta=timedelta(minutes=30))})
         assert response.status_code==404
+
+async def test_logout():
+    status=await fetch('/logout','get')
+    assert status==303
+
+async def test_health():
+    status=await fetch('/health','get', json=True)
+    assert status[1]=={'status':'not started'} #type:ignore

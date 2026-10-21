@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    command: sh -c "uvicorn main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - '8000:8000'
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://user:arv@db:5432/db
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      SECRET: a123
+      ALGORITHM: HS256
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+  rabbitmq:
+    image: rabbitmq:3.13
+    ports:
+      - '5672:5672'
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  db:
+    image: postgres:15
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: arv
+      POSTGRES_DB: db
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  worker:
+    build: .
+    command: uvicorn worker:app --host 0.0.0.0 --port 8080
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://user:arv@db:5432/db
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      SECRET: a123
+      ALGORITHM: HS256
+
+  retry_worker:
+    build: .
+    command: uvicorn retry_worker:app --host 0.0.0.0 --port 2000
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://user:arv@db:5432/db
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      SECRET: a123
+      ALGORITHM: HS256
+
+  dlx_worker:
+    build: .
+    command: uvicorn DLX_worker:app --host 0.0.0.0 --port 3000
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://user:arv@db:5432/db
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      SECRET: a123
+      ALGORITHM: HS256
+
+  update_worker:
+    build: .
+    command: uvicorn update_worker:update --host 0.0.0.0 --port 4000
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://user:arv@db:5432/db
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      SECRET: a123
+      ALGORITHM: HS256
+
+volumes:
+  postgres_data:

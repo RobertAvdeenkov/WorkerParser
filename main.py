@@ -5,6 +5,10 @@ from sqlalchemy import create_engine
 from tasks import router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+import logger
+from database import engine
+
+logger.logger.info('App started')
 
 app=FastAPI()
 app.mount("/templates", StaticFiles(directory="templates"), name="templates")
@@ -16,10 +20,10 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
-url=os.getenv('DATABASE_URL', 'sqlite:///workerparser.db')
-if '+asyncpg' in url:
-    url=url.replace('+asyncpg','')
-engine=create_engine(url)
-Base.metadata.create_all(engine)
+@app.on_event('startup')
+async def startup():
+    url=os.getenv('DATABASE_URL','sqlite+aiosqlite:///workerparser.db')
+    engine=create_engine(url)
+    Base.metadata.create_all(bind=engine)
 
 app.include_router(router)

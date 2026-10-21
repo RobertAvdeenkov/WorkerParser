@@ -5,6 +5,7 @@ venv/
 .env
 .pytest_cache/
 .ruff_cache/
+alembic/
 
 # VSCode
 .vscode/
@@ -12,3 +13,4 @@ venv/
 # OS
 workerparser.db
 test_workerparser.db
+.env

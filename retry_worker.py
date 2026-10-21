@@ -26,7 +26,6 @@ if os.getenv('REDIS_URL'):
 else: r=redis.Redis(decode_responses=True)
 
 async def main():
-    print('df')
     connection=await pika.connect_robust(os.getenv('RABBITMQ_URL',None))
     channel=await connection.channel()
     main_queue=await channel.declare_queue('sites')
@@ -45,7 +44,6 @@ async def main():
                         await r.set(f'site_id:{site[0]}', 1)
                         count=1
                     count=int(count)
-                    print(site[1], count)
                     if not(site[1].startswith('https://store.steampowered.com')):
                         dlx.append(site)
                         continue

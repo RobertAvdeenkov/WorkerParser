@@ -15,12 +15,15 @@ import asyncio
 import os
 import logger
 
+last_tick=None
+
 router=APIRouter()
 if os.getenv('REDIS_URL'):
     r=redis.from_url(os.getenv('REDIS_URL',''), decode_responses=True)
 else: r=redis.Redis(decode_responses=True)
 
 async def update_worker():
+    global last_tick
     try:
         connection= await pika.connect_robust(os.getenv('RABBITMQ_URL', None))
         channel= await connection.channel()
@@ -39,6 +42,7 @@ async def update_worker():
                         if all_sites:
                             await channel.default_exchange.publish(message=pika.Message(json.dumps(all_sites).encode()), routing_key='sites')
                         await asyncio.sleep(60)
+                        last_tick=datetime.now()
     except KeyboardInterrupt:
         return
 
@@ -57,6 +61,16 @@ async def register():
 @router.get('/mainpage')
 async def mainpage():
     return FileResponse('templates/mainpage.html')
+
+@router.get('/health')
+async def health():
+    global last_tick
+    if last_tick and datetime.now() - last_tick > timedelta(minutes=3):
+        return JSONResponse({'status':'suspend'}, status_code=503)
+    elif last_tick:
+        return JSONResponse({'status':'active'})
+    else:
+        return JSONResponse({'status':'not started'},status_code=404)
 
 @router.post('/reg')
 async def reg(name=Form(), password=Form(), db:AsyncSession=Depends(get_db)):

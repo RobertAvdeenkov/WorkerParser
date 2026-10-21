@@ -20,16 +20,8 @@
 1. Установите файлы
 2. Установите библиотеки: pip install --no-cache-dir -r requirements.txt
 3. Перейдите в папку
-4. Запуск воркера и кеширования:
-    1) docker run -d --name rabbitmq -p 5672:5672 rabbitmq:3.13 - запустить брокера
-    2) docker run -p 6379:6379 --name redis -d redis:7-alpine - запустить Redis
-5. В отдельных терминалах введите:
-    1) uvicorn main:app --reload - сайт
-    2) uvicorn update_worker:update --reload - отправка непросмотренных ссылок воркеру
-    3) uvicorn worker:app --reload - основной воркер
-    4) uvicorn retry_worker:app --reload - retry воркер
-    5) uvicorn DLX_worker:app --reload - DLX - воркер
-6. Запуск ТГ бота(по желанию): python bot.py
+4. В терминале: docker-compose up --build
+5. Запуск ТГ бота(по желанию, в отдельном терминале): python bot.py
 
 ## Функции:
 1. Ввод ссылки, заголовка для нее и целевую сумму
