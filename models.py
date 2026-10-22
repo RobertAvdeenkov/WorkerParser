@@ -8,7 +8,7 @@ class User(Base):
     id=Column(Integer,primary_key=True)
     name=Column(String)
     password=Column(String)
-    refresh_token=Column(String)
+    refresh_token=Column(String, default='')
     tg_id=Column(String,default='')
     message_on=Column(Boolean,default=False)
 
