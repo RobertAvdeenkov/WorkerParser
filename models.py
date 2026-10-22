@@ -1,4 +1,4 @@
-from sqlalchemy import Column,String,Integer,DateTime,ForeignKey,func
+from sqlalchemy import Column,String,Integer,DateTime,ForeignKey,func,Boolean
 from sqlalchemy.orm import relationship,DeclarativeBase
 
 class Base(DeclarativeBase):pass
@@ -9,6 +9,8 @@ class User(Base):
     name=Column(String)
     password=Column(String)
     refresh_token=Column(String)
+    tg_id=Column(String,default='')
+    message_on=Column(Boolean,default=False)
 
     sites=relationship('Site', back_populates='user')
     history=relationship('History', back_populates='user')

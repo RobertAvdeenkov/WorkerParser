@@ -32,13 +32,15 @@ async def update_worker():
                 while True:
                     async with SessionLocal() as db: #type:ignore
                         result=await db.execute(text('''
-                        select id,url,user_id from sites
+                        select sites.id,sites.url,sites.user_id, users.tg_id, users.id, users.message_on
+                        from sites
+                        inner join users on sites.user_id=user.id
                         where last_seen<=NOW() and result=\'Success\'
                         '''))
                         sites=result.all()
                         all_sites=[]
                         for i in sites:
-                            all_sites.append((str(i[0]),str(i[1]),str(i[2])))
+                            all_sites.append((str(i[0]),str(i[1]),str(i[2]), str(i[3]), '1' if i[5] else '0'))
                         if all_sites:
                             await channel.default_exchange.publish(message=pika.Message(json.dumps(all_sites).encode()), routing_key='sites')
                         await asyncio.sleep(60)

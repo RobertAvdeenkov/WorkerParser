@@ -9,6 +9,9 @@ from datetime import datetime
 from fastapi import FastAPI
 import os
 import logger
+import aiogram
+
+bot=aiogram.Bot(token=os.getenv('TOKEN')) #type:ignore
 
 app=FastAPI()
 
@@ -55,7 +58,7 @@ async def main():
                                     if pricediv:
                                         pricediv=pricediv.get('data-price-final')
                                 pricediv=str(pricediv).replace(',','.')[:-2:]
-                                result.append((i[0], response.status_code, round(float(pricediv)) if pricediv!='No' else 0, i[2])) #type:ignore
+                                result.append((i[0], response.status_code, round(float(pricediv)) if pricediv!='No' else 0, i[2], i[3], i[1], i[5])) #type:ignore
                             else:
                                 retry.append((i[0],i[1],i[2]))
                         else:
@@ -69,6 +72,9 @@ async def main():
                         await db.execute(text('INSERT INTO history (price, created_at, user_id, sites_id) VALUES (:price, :createdat, :ui, :si)'),
                                         [{'price':int(j[2]), 'createdat':datetime.now(), 'ui':int(j[3]), 'si':int(j[0])} for j in result])
                         await db.commit()
+                        for i in result:
+                            if i[5]:
+                                await bot.send_message(chat_id=i[4],text=f'Изменилась цена товара по ссылке: {i[5]}\nНовая цена: {i[2]} единиц')
                 await channel.default_exchange.publish(pika.Message(json.dumps(retry).encode()), 'retry')
         await queue.consume(callback) #type:ignore
         logger.logger.info('Started RabbitMQ Worker')

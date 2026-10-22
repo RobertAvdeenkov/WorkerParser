@@ -67,7 +67,9 @@ async def enterpassword(message:types.Message, state:FSMContext):
         await state.update_data(user_id=user.id)
         await state.update_data(page=0)
         await state.set_state(None)
-        await message.answer(f'Здравствуйте, {user.name}\nДля того, чтобы посмотреть историю парсера, введите /history, а чтобы выйти из аккаунта - /logout')
+        user.tg_id=message.from_user.id #type:ignore
+        await message.answer(f'Здравствуйте, {user.name}\nКоманды:\n/history - история парсера\n/logout - выход из аккаунта\n/settings - настройки')
+        await db.commit()
 
 async def historyLogic(message:types.Message | None, state:FSMContext):
     data=await state.get_data()
@@ -130,6 +132,46 @@ async def nextpage(message:types.Message, state:FSMContext):
 async def logout( message:types.Message, state:FSMContext):
     await state.clear()
     await message.answer(f'Вы вышли из аккаунта')
+    return
+
+@db.message(Command('settings'))
+async def setting(message:types.Message, state:FSMContext):
+    if not message: return
+    data=await state.get_data()
+    user_id=data.get('user_id')
+    if not user_id:
+        await message.answer('Вы не вошли в аккаунт! Чтобы войти введите /login') #type:ignore
+        return
+    async with SessionLocal() as db: #type:ignore
+        user=await(db.execute(select(User).filter(User.id==int(user_id)))).first()
+        if not user:
+            await message.answer('Такого пользователя нет!')
+            return
+    builder = InlineKeyboardBuilder()
+    builder.button(text="Включить сообщения" if not(user.message_on) else 'Выключить сообщения', callback_data="setting_messages")
+    builder.adjust(1)
+    await message.answer('НАСТРОЙКИ', reply_markup=builder.as_markup())
+    return
+
+@db.message(F.data=='setting_messages')
+async def setting_messages(message:types.Message, state:FSMContext):
+    if not message: return
+    data=await state.get_data()
+    user_id=data.get('user_id')
+    if not user_id:
+        await message.answer('Вы не вошли в аккаунт! Чтобы войти введите /login') #type:ignore
+        return
+    async with SessionLocal() as db: #type:ignore
+        user=await(db.execute(select(User).filter(User.id==int(user_id)))).first()
+        if not user:
+            await message.answer('Такого пользователя нет!')
+            return
+    if user.message_on:
+        user.message_on=False
+    else:
+        user.message_on=True
+    await db.commit()
+    await message.answer('Успешно!')
     return
 
 @app.on_event('startup')
