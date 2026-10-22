@@ -22,8 +22,8 @@ app.add_middleware(
 
 @app.on_event('startup')
 async def startup():
-    url=os.getenv('DATABASE_URL','sqlite+aiosqlite:///workerparser.db')
-    engine=create_engine(url)
+    url=os.getenv('DATABASE_URL','sqlite:///workerparser.db')
+    engine=create_engine(url.replace('+asyncpg',''))
     Base.metadata.create_all(bind=engine)
 
 app.include_router(router)

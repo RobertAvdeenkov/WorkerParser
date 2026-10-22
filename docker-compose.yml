@@ -112,6 +112,8 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
+      app:
+        condition: service_started
     environment:
       DATABASE_URL: postgresql+asyncpg://user:arv@db:5432/db
       REDIS_URL: redis://redis:6379

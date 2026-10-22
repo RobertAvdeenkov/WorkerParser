@@ -125,7 +125,7 @@ async def products(access_token=Cookie(), db:AsyncSession=Depends(get_db)):
 @router.post('/products')
 async def add_product(access_token=Cookie(), data=Body(), db:AsyncSession=Depends(get_db)):
     user=await get_by_token(access_token)
-    target=Site(title=data['title'], url=data['url'], wanted_price=data['target_price'], user_id=user.id)
+    target=Site(title=data['title'], url=data['url'], wanted_price=int(data['target_price']), user_id=user.id)
     db.add(target)
     await db.commit()
     await r.delete(f'{user.name}:products')

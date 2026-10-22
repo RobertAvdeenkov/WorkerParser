@@ -29,7 +29,7 @@ async def main():
             async with SessionLocal() as db: #type:ignore
                 await db.execute(text('''
                 UPDATE sites SET result=\'FAILED\' where id= :id_site
-                '''), [{'id_site':i[0]} for i in data])
+                '''), [{'id_site':int(i[0])} for i in data])
                 await db.commit()
 
     await queue.consume(callback) #type:ignore

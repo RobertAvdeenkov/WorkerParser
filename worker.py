@@ -64,10 +64,10 @@ async def main():
                     if result:
                         await db.execute(
                             text('UPDATE sites SET last_seen = NOW(), status_code = :code, last_price = :lp WHERE id = :id'),
-                            [{'code': i[1], 'id': i[0], 'lp':i[2]} for i in result]
+                            [{'code': int(i[1]), 'id': int(i[0]), 'lp':int(i[2])} for i in result]
                         )
                         await db.execute(text('INSERT INTO history (price, created_at, user_id, sites_id) VALUES (:price, :createdat, :ui, :si)'),
-                                        [{'price':j[2], 'createdat':datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'ui':j[3], 'si':j[0]} for j in result])
+                                        [{'price':int(j[2]), 'createdat':datetime.now(), 'ui':int(j[3]), 'si':int(j[0])} for j in result])
                         await db.commit()
                 await channel.default_exchange.publish(pika.Message(json.dumps(retry).encode()), 'retry')
         await queue.consume(callback) #type:ignore
